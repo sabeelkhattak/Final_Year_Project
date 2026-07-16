@@ -32,6 +32,15 @@ curl -X POST http://127.0.0.1:5001/predict \
   -F "file=@/path/to/xray.jpg"
 ```
 
+If the uploaded image is clearly not a chest X-ray, the API returns HTTP `422`:
+
+```json
+{
+  "error": "invalid_image",
+  "message": "Image is not a chest X-ray. Please capture a clear lung X-ray image."
+}
+```
+
 ## Docker Run
 
 ```bash
@@ -56,6 +65,13 @@ Recommended environment variables:
 MODEL_PATH=/app/final_model.keras
 UPLOAD_DIR=/tmp
 MAX_UPLOAD_MB=16
+MIN_IMAGE_SIDE=100
+MAX_AVERAGE_SATURATION=0.22
+MAX_HIGH_SATURATION_RATIO=0.18
+MAX_COLOR_CHANNEL_SPREAD=0.12
+MIN_GRAYSCALE_CONTRAST=0.06
+MAX_GRAYSCALE_MEAN=0.85
+MIN_DARK_PIXEL_RATIO=0.08
 WEB_CONCURRENCY=1
 GUNICORN_THREADS=2
 GUNICORN_TIMEOUT=120
