@@ -70,14 +70,17 @@ def is_probably_lung_xray(image_path: Path) -> bool:
     grayscale_contrast = float(grayscale.std())
     dark_pixel_ratio = float((grayscale < 0.25).mean())
 
-    return (
-        average_saturation <= MAX_AVERAGE_SATURATION
-        and high_saturation_ratio <= MAX_HIGH_SATURATION_RATIO
-        and channel_spread <= MAX_COLOR_CHANNEL_SPREAD
-        and grayscale_mean <= MAX_GRAYSCALE_MEAN
-        and grayscale_contrast >= MIN_GRAYSCALE_CONTRAST
-        and dark_pixel_ratio >= MIN_DARK_PIXEL_RATIO
+    if grayscale_contrast < MIN_GRAYSCALE_CONTRAST:
+        return False
+
+    very_colorful = (
+        average_saturation > MAX_AVERAGE_SATURATION
+        and high_saturation_ratio > MAX_HIGH_SATURATION_RATIO
+        and channel_spread > MAX_COLOR_CHANNEL_SPREAD
     )
+    very_bright_flat = grayscale_mean > MAX_GRAYSCALE_MEAN and dark_pixel_ratio < MIN_DARK_PIXEL_RATIO
+
+    return not (very_colorful or very_bright_flat)
 
 
 def predict_image(image_path: Path) -> tuple[str, float]:
